@@ -1,35 +1,27 @@
 package com.register.usecase.impl;
 
-import com.register.adapter.repositories.PatientRepository;
-import com.register.adapter.repositories.entity.PatientEntity;
 import com.register.model.Patient;
+import com.register.usecase.DataProvider;
 import com.register.usecase.PatientService;
-import net.bytebuddy.implementation.bytecode.Throw;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PatientServiceImpl implements PatientService {
 
     @Autowired
-    private PatientRepository repository;
-
-    @Autowired
-    private ModelMapper modelMapper;
+    private DataProvider dataProvider;
 
     private String message;
 
     @Override
     public String createPatient(Patient patient) {
-        PatientEntity entity = modelMapper.map(patient, PatientEntity.class);
 
         try {
-            repository.save(entity);
+            dataProvider.save(patient);
             message = "sucesso";
         }catch (Exception e){
             message = "Falha na transação " + e;
@@ -42,11 +34,9 @@ public class PatientServiceImpl implements PatientService {
     public List<Patient> findAllPatient() {
         List<Patient> listModel =  new ArrayList<>();
         try{
-            List<PatientEntity> listPatient = repository.findAll();
-            for (PatientEntity e: listPatient) {
-                Patient model = modelMapper.map(e, Patient.class);
-                listModel.add(model);
-            }
+            listModel = dataProvider.findAll();
+
+
         }catch (Exception e) {
 
         }
@@ -58,11 +48,20 @@ public class PatientServiceImpl implements PatientService {
     public Patient findPatientById(Integer id) {
 
         try{
-            Optional<PatientEntity> entity = repository.findById(id);
-            Patient model = modelMapper.map(entity.get(), Patient.class);
-            return model;
+            Patient entity = dataProvider.findById(id);
+            return entity;
         }catch (Exception e) {
             throw e;
+        }
+    }
+
+    @Override
+    public Boolean deletePatient(Integer id){
+        try {
+            dataProvider.delete(id);
+            return true;
+        }catch (Exception e){
+            return false;
         }
 
 

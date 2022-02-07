@@ -14,4 +14,6 @@ public interface PatientService {
 
     Patient findPatientById(Integer id);
 
+    Boolean deletePatient(Integer id);
+
 }
